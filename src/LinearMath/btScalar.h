@@ -39,7 +39,7 @@ inline int	btGetVersion()
 #define BT_DEBUG
 #endif
 
-
+#define BT_NO_ALIGN
 #ifdef _WIN32
 
 		#if defined(__MINGW32__) || defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300) || defined(BT_NO_ALIGN)
