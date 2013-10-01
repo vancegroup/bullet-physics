@@ -1,7 +1,10 @@
-SUBDIRS( Serialize ConvexDecomposition HACD GIMPACTUtils )
+add_subdirectory(Serialize)
+add_subdirectory(ConvexDecomposition)
+add_subdirectory(HACD)
+add_subdirectory(GIMPACTUtils)
 
 #Maya Dynamica plugin is moved to http://dynamica.googlecode.com
 
-IF (USE_GLUT AND GLUT_FOUND)
-	SUBDIRS (glui)
-ENDIF ()
+if(USE_GLUT AND GLUT_FOUND)
+	add_subdirectory(glui)
+endif()

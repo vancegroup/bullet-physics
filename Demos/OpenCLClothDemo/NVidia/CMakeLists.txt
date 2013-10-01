@@ -1,86 +1,109 @@
 
 
-ADD_DEFINITIONS(-DUSE_NVIDIA_OPENCL)
-ADD_DEFINITIONS(-DCL_PLATFORM_NVIDIA)
+add_definitions(-DUSE_NVIDIA_OPENCL)
+add_definitions(-DCL_PLATFORM_NVIDIA)
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src 
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL
-${NVIDIA_OPENCL_INCLUDES}
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL
+	${NVIDIA_OPENCL_INCLUDES})
 
-IF(WIN32)
-ADD_DEFINITIONS(-DGLEW_STATIC)
-ENDIF(WIN32)
+if(WIN32)
+	add_definitions(-DGLEW_STATIC)
+endif()
 
 
-IF (CMAKE_CL_64)
-	SET(CMAK_GLEW_LIBRARY
-		${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew64s.lib		)
-ELSE(CMAKE_CL_64)
-	SET(CMAK_GLEW_LIBRARY		${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew32s.lib		)
-ENDIF(CMAKE_CL_64)
+if(CMAKE_CL_64)
+	set(CMAK_GLEW_LIBRARY ${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew64s.lib)
+else()
+	set(CMAK_GLEW_LIBRARY ${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew32s.lib)
+endif()
 
 
-IF (USE_GLUT)
+if(USE_GLUT)
 
-	LINK_LIBRARIES(
-		OpenGLSupport 
+	link_libraries(OpenGLSupport
 		BulletSoftBodySolvers_OpenCL_NVidia
 		BulletMultiThreaded
 		BulletSoftBody
-		BulletDynamics  
-		BulletCollision  
-		LinearMath 
-		${GLUT_glut_LIBRARY} 
-		${OPENGL_gl_LIBRARY} 
+		BulletDynamics
+		BulletCollision
+		LinearMath
+		${GLUT_glut_LIBRARY}
+		${OPENGL_gl_LIBRARY}
 		${OPENGL_glu_LIBRARY}
 		${CMAK_GLEW_LIBRARY}
-		${NVIDIA_OPENCL_LIBRARIES}
-	)
+		${NVIDIA_OPENCL_LIBRARIES})
 
-	ADD_EXECUTABLE(AppOpenCLClothDemo_NVidia
+	add_executable(AppOpenCLClothDemo_NVidia
 		../cl_cloth_demo.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLInclude.h
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.cpp
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.h
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLInclude.h
 		../gl_win.cpp
 		../clstuff.cpp
 		../clstuff.h
-		../gl_win.h
+		../gl_win.h)
+else()
+endif()
 
-	)
-ELSE (USE_GLUT)
-ENDIF (USE_GLUT)
+if(WIN32)
+	if(CMAKE_CL_64)
+		if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+			add_custom_command(TARGET
+				AppOpenCLClothDemo_NVidia
+				POST_BUILD
+				COMMAND
+				${CMAKE_COMMAND}
+				ARGS
+				-E
+				copy_if_different
+				${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll
+				${CMAKE_CURRENT_BINARY_DIR})
+		endif()
+	else()
+		if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+			add_custom_command(TARGET
+				AppOpenCLClothDemo_NVidia
+				POST_BUILD
+				COMMAND
+				${CMAKE_COMMAND}
+				ARGS
+				-E
+				copy_if_different
+				${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL
+				${CMAKE_CURRENT_BINARY_DIR})
 
-IF(WIN32)
-IF (CMAKE_CL_64)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppOpenCLClothDemo_NVidia		POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll ${CMAKE_CURRENT_BINARY_DIR}	
-					)
-	ENDIF()
-ELSE(CMAKE_CL_64)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppOpenCLClothDemo_NVidia	POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL ${CMAKE_CURRENT_BINARY_DIR}
-					)
+		endif()
+	endif()
+endif()
+if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+	add_custom_command(TARGET
+		AppOpenCLClothDemo_NVidia
+		POST_BUILD
+		COMMAND
+		${CMAKE_COMMAND}
+		ARGS
+		-E
+		copy_if_different
+		${BULLET_PHYSICS_SOURCE_DIR}/bullet_logo.png
+		${CMAKE_CURRENT_BINARY_DIR})
+endif()
+if(UNIX)
+	target_link_libraries(AppOpenCLClothDemo_NVidia pthread)
+endif()
 
-	ENDIF()
-ENDIF(CMAKE_CL_64)
-ENDIF(WIN32)
-IF(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-	ADD_CUSTOM_COMMAND(	TARGET AppOpenCLClothDemo_NVidia	POST_BUILD
-			COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/bullet_logo.png ${CMAKE_CURRENT_BINARY_DIR}
-			)
-ENDIF()
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppOpenCLClothDemo_NVidia pthread)
-ENDIF(UNIX)
-
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppOpenCLClothDemo_NVidia PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppOpenCLClothDemo_NVidia PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppOpenCLClothDemo_NVidia PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppOpenCLClothDemo_NVidia
+		PROPERTIES
+		DEBUG_POSTFIX
+		"_Debug")
+	set_target_properties(AppOpenCLClothDemo_NVidia
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppOpenCLClothDemo_NVidia
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()

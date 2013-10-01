@@ -1,38 +1,45 @@
 # AppMiniCLVectorAdd is a very basic test for MiniCL.
 
 
-ADD_DEFINITIONS(-DUSE_MINICL)
+add_definitions(-DUSE_MINICL)
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src 
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
-LINK_LIBRARIES(
-	MiniCL
-	BulletMultiThreaded 
-	LinearMath
-)
+link_libraries(MiniCL BulletMultiThreaded LinearMath)
 
-ADD_EXECUTABLE(AppVectorAdd_Mini
-../MiniCL_VectorAdd.cpp
-../VectorAddKernels.cl
-)
+add_executable(AppVectorAdd_Mini
+	../MiniCL_VectorAdd.cpp
+	../VectorAddKernels.cl)
 
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppVectorAdd_Mini pthread)
-ENDIF(UNIX)
+if(UNIX)
+	target_link_libraries(AppVectorAdd_Mini pthread)
+endif()
 
 
-IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-	ADD_CUSTOM_COMMAND(
-		TARGET AppVectorAdd_Mini
+if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+	add_custom_command(TARGET
+		AppVectorAdd_Mini
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/Demos/VectorAdd_OpenCL/VectorAddKernels.cl ${CMAKE_CURRENT_BINARY_DIR}
-	)
-ENDIF()
-				
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppVectorAdd_Mini PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppVectorAdd_Mini PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppVectorAdd_Mini PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+		COMMAND
+		${CMAKE_COMMAND}
+		ARGS
+		-E
+		copy_if_different
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/VectorAdd_OpenCL/VectorAddKernels.cl
+		${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppVectorAdd_Mini
+		PROPERTIES
+		DEBUG_POSTFIX
+		"_Debug")
+	set_target_properties(AppVectorAdd_Mini
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppVectorAdd_Mini
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()

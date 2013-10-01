@@ -1,8 +1,8 @@
-INCLUDE_DIRECTORIES( ${BULLET_PHYSICS_SOURCE_DIR}/src  )
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
 
 
-SET(BulletDynamics_SRCS
+set(BulletDynamics_SRCS
 	Character/btKinematicCharacterController.cpp
 	ConstraintSolver/btConeTwistConstraint.cpp
 	ConstraintSolver/btContactConstraint.cpp
@@ -22,14 +22,10 @@ SET(BulletDynamics_SRCS
 	Dynamics/btSimpleDynamicsWorld.cpp
 	Dynamics/Bullet-C-API.cpp
 	Vehicle/btRaycastVehicle.cpp
-	Vehicle/btWheelInfo.cpp
-)
+	Vehicle/btWheelInfo.cpp)
 
-SET(Root_HDRS
-	../btBulletDynamicsCommon.h
-	../btBulletCollisionCommon.h
-)
-SET(ConstraintSolver_HDRS
+set(Root_HDRS ../btBulletDynamicsCommon.h ../btBulletCollisionCommon.h)
+set(ConstraintSolver_HDRS
 	ConstraintSolver/btConeTwistConstraint.h
 	ConstraintSolver/btConstraintSolver.h
 	ConstraintSolver/btContactConstraint.h
@@ -47,68 +43,100 @@ SET(ConstraintSolver_HDRS
 	ConstraintSolver/btSolverBody.h
 	ConstraintSolver/btSolverConstraint.h
 	ConstraintSolver/btTypedConstraint.h
-	ConstraintSolver/btUniversalConstraint.h
-)
-SET(Dynamics_HDRS
+	ConstraintSolver/btUniversalConstraint.h)
+set(Dynamics_HDRS
 	Dynamics/btActionInterface.h
 	Dynamics/btDiscreteDynamicsWorld.h
 	Dynamics/btDynamicsWorld.h
 	Dynamics/btSimpleDynamicsWorld.h
-	Dynamics/btRigidBody.h
-)
-SET(Vehicle_HDRS
+	Dynamics/btRigidBody.h)
+set(Vehicle_HDRS
 	Vehicle/btRaycastVehicle.h
 	Vehicle/btVehicleRaycaster.h
-	Vehicle/btWheelInfo.h
-)
+	Vehicle/btWheelInfo.h)
 
-SET(Character_HDRS
+set(Character_HDRS
 	Character/btCharacterControllerInterface.h
-	Character/btKinematicCharacterController.h
-)
+	Character/btKinematicCharacterController.h)
 
 
 
-SET(BulletDynamics_HDRS
+set(BulletDynamics_HDRS
 	${Root_HDRS}
 	${ConstraintSolver_HDRS}
 	${Dynamics_HDRS}
 	${Vehicle_HDRS}
-	${Character_HDRS}
-)
+	${Character_HDRS})
 
 
-ADD_LIBRARY(BulletDynamics ${BulletDynamics_SRCS} ${BulletDynamics_HDRS})
-SET_TARGET_PROPERTIES(BulletDynamics PROPERTIES VERSION ${BULLET_VERSION})
-SET_TARGET_PROPERTIES(BulletDynamics PROPERTIES SOVERSION ${BULLET_VERSION})
-IF (BUILD_SHARED_LIBS)
-	TARGET_LINK_LIBRARIES(BulletDynamics BulletCollision LinearMath)
-ENDIF (BUILD_SHARED_LIBS)
+add_library(BulletDynamics
+	${BulletDynamics_SRCS}
+	${BulletDynamics_HDRS})
+set_target_properties(BulletDynamics
+	PROPERTIES
+	VERSION
+	${BULLET_VERSION})
+set_target_properties(BulletDynamics
+	PROPERTIES
+	SOVERSION
+	${BULLET_VERSION})
 
-IF (INSTALL_LIBS)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-			IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS BulletDynamics DESTINATION .)
-			ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS BulletDynamics DESTINATION lib${LIB_SUFFIX})
-				INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.h"  PATTERN
-".svn" EXCLUDE PATTERN "CMakeFiles" EXCLUDE)
-				INSTALL(FILES ../btBulletDynamicsCommon.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/BulletDynamics)
-			ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-		ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+target_link_libraries(BulletDynamics BulletCollision LinearMath)
 
-		IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-			SET_TARGET_PROPERTIES(BulletDynamics PROPERTIES FRAMEWORK true)
-			SET_TARGET_PROPERTIES(BulletDynamics PROPERTIES PUBLIC_HEADER "${Root_HDRS}")
+
+if(INSTALL_LIBS)
+	if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			install(TARGETS BulletDynamics DESTINATION .)
+		else()
+			install(TARGETS BulletDynamics DESTINATION lib${LIB_SUFFIX})
+			install(DIRECTORY
+				${CMAKE_CURRENT_SOURCE_DIR}
+				DESTINATION
+				${INCLUDE_INSTALL_DIR}
+				FILES_MATCHING
+				PATTERN
+				"*.h"
+				PATTERN
+				".svn"
+				EXCLUDE
+				PATTERN
+				"CMakeFiles"
+				EXCLUDE)
+			install(FILES
+				../btBulletDynamicsCommon.h
+				DESTINATION
+				${INCLUDE_INSTALL_DIR}/BulletDynamics)
+		endif()
+
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			set_target_properties(BulletDynamics PROPERTIES FRAMEWORK true)
+			set_target_properties(BulletDynamics
+				PROPERTIES
+				PUBLIC_HEADER
+				"${Root_HDRS}")
 			# Have to list out sub-directories manually:
-			SET_PROPERTY(SOURCE ${ConstraintSolver_HDRS} PROPERTY MACOSX_PACKAGE_LOCATION Headers/ConstraintSolver)
-			SET_PROPERTY(SOURCE ${Dynamics_HDRS} PROPERTY MACOSX_PACKAGE_LOCATION Headers/Dynamics)
-			SET_PROPERTY(SOURCE ${Vehicle_HDRS} PROPERTY MACOSX_PACKAGE_LOCATION Headers/Vehicle)
-			SET_PROPERTY(SOURCE ${Character_HDRS} PROPERTY MACOSX_PACKAGE_LOCATION Headers/Character)
-				
-		ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-	ENDIF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-ENDIF (INSTALL_LIBS)
+			set_property(SOURCE
+				${ConstraintSolver_HDRS}
+				PROPERTY
+				MACOSX_PACKAGE_LOCATION
+				Headers/ConstraintSolver)
+			set_property(SOURCE
+				${Dynamics_HDRS}
+				PROPERTY
+				MACOSX_PACKAGE_LOCATION
+				Headers/Dynamics)
+			set_property(SOURCE
+				${Vehicle_HDRS}
+				PROPERTY
+				MACOSX_PACKAGE_LOCATION
+				Headers/Vehicle)
+			set_property(SOURCE
+				${Character_HDRS}
+				PROPERTY
+				MACOSX_PACKAGE_LOCATION
+				Headers/Character)
+
+		endif()
+	endif()
+endif()

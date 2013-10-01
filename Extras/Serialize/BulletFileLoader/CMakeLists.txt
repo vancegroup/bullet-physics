@@ -1,49 +1,64 @@
-INCLUDE_DIRECTORIES( 
-	${BULLET_PHYSICS_SOURCE_DIR}/src  
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
-SET(BulletFileLoader_SRCS
-bChunk.cpp
-bDNA.cpp
-bFile.cpp
-btBulletFile.cpp
-)
+set(BulletFileLoader_SRCS
+	bChunk.cpp
+	bDNA.cpp
+	bFile.cpp
+	btBulletFile.cpp)
 
-SET(BulletFileLoader_HDRS
-bChunk.h
-bCommon.h
-bDefines.h
-bDNA.h
-bFile.h
-btBulletFile.h
-)
+set(BulletFileLoader_HDRS
+	bChunk.h
+	bCommon.h
+	bDefines.h
+	bDNA.h
+	bFile.h
+	btBulletFile.h)
 
-ADD_LIBRARY(BulletFileLoader ${BulletFileLoader_SRCS} ${BulletFileLoader_HDRS})
+add_library(BulletFileLoader
+	${BulletFileLoader_SRCS}
+	${BulletFileLoader_HDRS})
 
-IF (BUILD_SHARED_LIBS)
-        TARGET_LINK_LIBRARIES(BulletFileLoader LinearMath)
-ENDIF (BUILD_SHARED_LIBS)
+target_link_libraries(BulletFileLoader LinearMath)
 
-SET_TARGET_PROPERTIES(BulletFileLoader PROPERTIES VERSION ${BULLET_VERSION}) 
-SET_TARGET_PROPERTIES(BulletFileLoader PROPERTIES SOVERSION ${BULLET_VERSION})
+set_target_properties(BulletFileLoader
+	PROPERTIES
+	VERSION
+	${BULLET_VERSION})
+set_target_properties(BulletFileLoader
+	PROPERTIES
+	SOVERSION
+	${BULLET_VERSION})
 
-IF (INSTALL_EXTRA_LIBS)
-        IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-                #FILES_MATCHING requires CMake 2.6
-                IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-                        IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-                                INSTALL(TARGETS BulletFileLoader DESTINATION .)
-                        ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-                                INSTALL(TARGETS BulletFileLoader DESTINATION lib${LIB_SUFFIX})
-                                INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.h"  PATTERN
-".svn" EXCLUDE PATTERN "CMakeFiles" EXCLUDE)
-                        ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-                ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+if(INSTALL_EXTRA_LIBS)
+	if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+		#FILES_MATCHING requires CMake 2.6
+		if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+			if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+				install(TARGETS BulletFileLoader DESTINATION .)
+			else()
+				install(TARGETS BulletFileLoader DESTINATION lib${LIB_SUFFIX})
+				install(DIRECTORY
+					${CMAKE_CURRENT_SOURCE_DIR}
+					DESTINATION
+					${INCLUDE_INSTALL_DIR}
+					FILES_MATCHING
+					PATTERN
+					"*.h"
+					PATTERN
+					".svn"
+					EXCLUDE
+					PATTERN
+					"CMakeFiles"
+					EXCLUDE)
+			endif()
+		endif()
 
-                IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-                        SET_TARGET_PROPERTIES(BulletFileLoader PROPERTIES FRAMEWORK true)
-                        SET_TARGET_PROPERTIES(BulletFileLoader PROPERTIES PUBLIC_HEADER "${BulletFileLoader_HDRS}")
-                ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-        ENDIF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-ENDIF (INSTALL_EXTRA_LIBS)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			set_target_properties(BulletFileLoader PROPERTIES FRAMEWORK true)
+			set_target_properties(BulletFileLoader
+				PROPERTIES
+				PUBLIC_HEADER
+				"${BulletFileLoader_HDRS}")
+		endif()
+	endif()
+endif()

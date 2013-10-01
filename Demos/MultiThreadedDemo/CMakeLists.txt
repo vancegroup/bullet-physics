@@ -2,54 +2,84 @@
 
 
 # For every executable you have with a main method you should have an add_executable line below.
-# For every add executable line you should list every .cpp and .h file you have associated with that executable.  
+# For every add executable line you should list every .cpp and .h file you have associated with that executable.
 
 
 
-# You shouldn't have to modify anything below this line 
+# You shouldn't have to modify anything below this line
 ########################################################
 
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src 
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL 
-${VECTOR_MATH_INCLUDE}
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL
+	${VECTOR_MATH_INCLUDE})
 
-IF(WIN32)
-	ADD_DEFINITIONS(-DGLEW_STATIC)
-ENDIF(WIN32)
+if(WIN32)
+	add_definitions(-DGLEW_STATIC)
+endif()
 
-LINK_LIBRARIES(
-OpenGLSupport   BulletMultiThreaded BulletDynamics  BulletCollision LinearMath    ${GLUT_glut_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY}
-)
 
-ADD_EXECUTABLE(AppMultiThreadedDemo
+add_executable(AppMultiThreadedDemo
 	main.cpp
 	MultiThreadedDemo.cpp
-	MultiThreadedDemo.h
-)
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppMultiThreadedDemo pthread)
-ENDIF(UNIX)
+	MultiThreadedDemo.h)
 
-IF(WIN32)
-IF (CMAKE_CL_64)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppMultiThreadedDemo		POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll ${CMAKE_CURRENT_BINARY_DIR}	)
-	ENDIF()
-ELSE(CMAKE_CL_64)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppMultiThreadedDemo	POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL ${CMAKE_CURRENT_BINARY_DIR})
-	ENDIF()
-ENDIF(CMAKE_CL_64)
-ENDIF(WIN32)
+target_link_libraries(AppMultiThreadedDemo
+	OpenGLSupport
+	BulletMultiThreaded
+	BulletDynamics
+	BulletCollision
+	LinearMath
+	${GLUT_glut_LIBRARY}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY})
+
+if(UNIX)
+	target_link_libraries(AppMultiThreadedDemo pthread)
+endif()
+
+if(WIN32)
+	if(CMAKE_CL_64)
+		if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+			add_custom_command(TARGET
+				AppMultiThreadedDemo
+				POST_BUILD
+				COMMAND
+				${CMAKE_COMMAND}
+				ARGS
+				-E
+				copy_if_different
+				${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll
+				${CMAKE_CURRENT_BINARY_DIR})
+		endif()
+	else()
+		if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+			add_custom_command(TARGET
+				AppMultiThreadedDemo
+				POST_BUILD
+				COMMAND
+				${CMAKE_COMMAND}
+				ARGS
+				-E
+				copy_if_different
+				${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL
+				${CMAKE_CURRENT_BINARY_DIR})
+		endif()
+	endif()
+endif()
 
 
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppMultiThreadedDemo PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppMultiThreadedDemo PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppMultiThreadedDemo PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppMultiThreadedDemo
+		PROPERTIES
+		DEBUG_POSTFIX
+		"_Debug")
+	set_target_properties(AppMultiThreadedDemo
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppMultiThreadedDemo
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()

@@ -1,13 +1,10 @@
-INCLUDE_DIRECTORIES( 
-	${BULLET_PHYSICS_SOURCE_DIR}/src
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
 	${BULLET_PHYSICS_SOURCE_DIR}/Extras/Serialize/BulletFileLoader
-	${BULLET_PHYSICS_SOURCE_DIR}/Extras/Serialize/BulletWorldImporter
-)
+	${BULLET_PHYSICS_SOURCE_DIR}/Extras/Serialize/BulletWorldImporter)
 
-ADD_LIBRARY(
-	BulletXmlWorldImporter 
-	btBulletXmlWorldImporter.cpp 
-	btBulletXmlWorldImporter.h 
+add_library(BulletXmlWorldImporter
+	btBulletXmlWorldImporter.cpp
+	btBulletXmlWorldImporter.h
 	string_split.cpp
 	string_split.h
 	tinyxml.cpp
@@ -15,33 +12,54 @@ ADD_LIBRARY(
 	tinystr.cpp
 	tinystr.h
 	tinyxmlerror.cpp
-	tinyxmlparser.cpp
-)
+	tinyxmlparser.cpp)
 
-SET_TARGET_PROPERTIES(BulletXmlWorldImporter  PROPERTIES VERSION ${BULLET_VERSION})
-SET_TARGET_PROPERTIES(BulletXmlWorldImporter PROPERTIES SOVERSION ${BULLET_VERSION})
+set_target_properties(BulletXmlWorldImporter
+	PROPERTIES
+	VERSION
+	${BULLET_VERSION})
+set_target_properties(BulletXmlWorldImporter
+	PROPERTIES
+	SOVERSION
+	${BULLET_VERSION})
 
-IF (BUILD_SHARED_LIBS)
-        TARGET_LINK_LIBRARIES(BulletXmlWorldImporter BulletWorldImporter BulletDynamics BulletCollision BulletFileLoader LinearMath)
-ENDIF (BUILD_SHARED_LIBS)
+target_link_libraries(BulletXmlWorldImporter
+	BulletWorldImporter
+	BulletDynamics
+	BulletCollision
+	BulletFileLoader
+	LinearMath)
 
-IF (INSTALL_EXTRA_LIBS)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		#FILES_MATCHING requires CMake 2.6
-		IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-			IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS BulletXmlWorldImporter DESTINATION .)
-			ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS BulletXmlWorldImporter DESTINATION lib${LIB_SUFFIX})
-				INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.h"  PATTERN
-".svn" EXCLUDE PATTERN "CMakeFiles" EXCLUDE)
-			ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-		ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+if(INSTALL_EXTRA_LIBS)
+	if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			install(TARGETS BulletXmlWorldImporter DESTINATION .)
+		else()
+			install(TARGETS BulletXmlWorldImporter DESTINATION lib${LIB_SUFFIX})
+			install(DIRECTORY
+				${CMAKE_CURRENT_SOURCE_DIR}
+				DESTINATION
+				${INCLUDE_INSTALL_DIR}
+				FILES_MATCHING
+				PATTERN
+				"*.h"
+				PATTERN
+				".svn"
+				EXCLUDE
+				PATTERN
+				"CMakeFiles"
+				EXCLUDE)
+		endif()
 
-		IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-			SET_TARGET_PROPERTIES(BulletXmlWorldImporter PROPERTIES FRAMEWORK true)
-			SET_TARGET_PROPERTIES(BulletXmlWorldImporter PROPERTIES PUBLIC_HEADER "btBulletXmlWorldImporter.h")
-		ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-	ENDIF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-ENDIF (INSTALL_EXTRA_LIBS)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			set_target_properties(BulletXmlWorldImporter
+				PROPERTIES
+				FRAMEWORK
+				true)
+			set_target_properties(BulletXmlWorldImporter
+				PROPERTIES
+				PUBLIC_HEADER
+				"btBulletXmlWorldImporter.h")
+		endif()
+	endif()
+endif()

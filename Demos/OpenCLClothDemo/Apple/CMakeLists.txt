@@ -1,55 +1,59 @@
 
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src 
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL)
 
 
-IF (APPLE)
-  FIND_LIBRARY(OPENCL_LIBRARY OpenCL DOC "OpenCL lib for OSX")
-  FIND_PATH(OPENCL_INCLUDE_DIR OpenCL/cl.h DOC "Include for OpenCL on OSX")
-ENDIF (APPLE)
+if(APPLE)
+	find_library(OPENCL_LIBRARY OpenCL DOC "OpenCL lib for OSX")
+	find_path(OPENCL_INCLUDE_DIR
+		OpenCL/cl.h
+		DOC
+		"Include for OpenCL on OSX")
+endif()
 
 
-IF (USE_GLUT)
-	LINK_LIBRARIES(
-		OpenGLSupport 
+if(USE_GLUT)
+	link_libraries(OpenGLSupport
 		BulletSoftBodySolvers_OpenCL_Apple
 		BulletMultiThreaded
 		BulletSoftBody
-		BulletDynamics  
-		BulletCollision  
+		BulletDynamics
+		BulletCollision
 		LinearMath
 		${OPENCL_LIBRARY}
-		${GLUT_glut_LIBRARY} 
-		${OPENGL_gl_LIBRARY} 
+		${GLUT_glut_LIBRARY}
+		${OPENGL_gl_LIBRARY}
 		${OPENGL_glu_LIBRARY}
-		${CMAK_GLEW_LIBRARY}
-	)
+		${CMAK_GLEW_LIBRARY})
 
 
-	ADD_EXECUTABLE(AppOpenCLClothDemo_Apple
+	add_executable(AppOpenCLClothDemo_Apple
 		../cl_cloth_demo.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLInclude.h
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.cpp
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.h
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLInclude.h
 		../gl_win.cpp
 		../clstuff.cpp
 		../clstuff.h
-		../gl_win.h
-
-	)
-ELSE (USE_GLUT)
-ENDIF (USE_GLUT)
+		../gl_win.h)
+else()
+endif()
 
 
-ADD_CUSTOM_COMMAND(	TARGET AppOpenCLClothDemo_Apple	POST_BUILD
-			COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/bullet_logo.png ${CMAKE_CURRENT_BINARY_DIR}
-			)
+add_custom_command(TARGET
+	AppOpenCLClothDemo_Apple
+	POST_BUILD
+	COMMAND
+	${CMAKE_COMMAND}
+	ARGS
+	-E
+	copy_if_different
+	${BULLET_PHYSICS_SOURCE_DIR}/bullet_logo.png
+	${CMAKE_CURRENT_BINARY_DIR})
 
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppOpenCLClothDemo_Apple pthread)
-ENDIF(UNIX)
+if(UNIX)
+	target_link_libraries(AppOpenCLClothDemo_Apple pthread)
+endif()
 

@@ -1,9 +1,6 @@
-INCLUDE_DIRECTORIES(
-	include
-)
-	
-ADD_LIBRARY(cppunit
+include_directories(include)
 
+add_library(cppunit
 #core
 	src/cppunit/AdditionalMessage.cpp
 	src/cppunit/Asserter.cpp
@@ -70,5 +67,4 @@ ADD_LIBRARY(cppunit
 	src/cppunit/StringTools.cpp
 	src/cppunit/XmlDocument.cpp
 	src/cppunit/XmlElement.cpp
-	
 )

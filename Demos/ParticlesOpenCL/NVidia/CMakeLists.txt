@@ -1,95 +1,126 @@
 
 
-ADD_DEFINITIONS(-DUSE_NVIDIA_OPENCL)
-ADD_DEFINITIONS(-DCL_PLATFORM_NVIDIA)
+add_definitions(-DUSE_NVIDIA_OPENCL)
+add_definitions(-DCL_PLATFORM_NVIDIA)
 
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src 
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL
-${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL
-${NVIDIA_OPENCL_INCLUDES}
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL
+	${BULLET_PHYSICS_SOURCE_DIR}/Demos/OpenGL
+	${NVIDIA_OPENCL_INCLUDES})
 
-IF(WIN32)
-ADD_DEFINITIONS(-DGLEW_STATIC)
-ENDIF(WIN32)
+if(WIN32)
+	add_definitions(-DGLEW_STATIC)
+endif()
 
-IF(WIN32)
-	IF (CMAKE_CL_64)
-		SET(CMAK_GLEW_LIBRARY		${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew64s.lib		)
-	ELSE(CMAKE_CL_64)
-		SET(CMAK_GLEW_LIBRARY		${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew32s.lib		)
-	ENDIF(CMAKE_CL_64)
-ELSE()
-	IF(UNIX AND NOT APPLE)
-		FIND_LIBRARY(CMAK_GLEW_LIBRARY GLEW PATH /usr/lib /usr/local/lib /usr/lib64 /usr/local/lib64 )
-	ENDIF()
-ENDIF(WIN32)
+if(WIN32)
+	if(CMAKE_CL_64)
+		set(CMAK_GLEW_LIBRARY ${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew64s.lib)
+	else()
+		set(CMAK_GLEW_LIBRARY ${BULLET_PHYSICS_SOURCE_DIR}/Glut/glew32s.lib)
+	endif()
+else()
+	if(UNIX AND NOT APPLE)
+		find_library(CMAK_GLEW_LIBRARY
+			GLEW
+			PATH
+			/usr/lib
+			/usr/local/lib
+			/usr/lib64
+			/usr/local/lib64)
+	endif()
+endif()
 
-IF(CMAK_GLEW_LIBRARY)
+if(CMAK_GLEW_LIBRARY)
 
-IF (USE_GLUT)
-	LINK_LIBRARIES(
-		OpenGLSupport 
-		BulletDynamics  
-		BulletCollision 
-		LinearMath 
-		${GLUT_glut_LIBRARY} 
-		${OPENGL_gl_LIBRARY} 
-		${OPENGL_glu_LIBRARY}
-		${CMAK_GLEW_LIBRARY}
-		${NVIDIA_OPENCL_LIBRARIES}
-	)
+	if(USE_GLUT)
+		link_libraries(OpenGLSupport
+			BulletDynamics
+			BulletCollision
+			LinearMath
+			${GLUT_glut_LIBRARY}
+			${OPENGL_gl_LIBRARY}
+			${OPENGL_glu_LIBRARY}
+			${CMAK_GLEW_LIBRARY}
+			${NVIDIA_OPENCL_LIBRARIES})
 
-	ADD_EXECUTABLE(AppParticlesOCL_Nv
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesDynamicsWorld.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesSharedDefs.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesSharedTypes.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesDemo.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/shaders.h	
+		add_executable(AppParticlesOCL_Nv
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesDynamicsWorld.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesSharedDefs.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesSharedTypes.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesDemo.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/shaders.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.cpp
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLInclude.h
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesDemoDynamicsWorld.cpp
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/main.cpp
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesDemo.cpp
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/shaders.cpp
+			${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesOCL.cl)
+	else()
+	endif()
 
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLUtils.h
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/SharedOpenCL/btOpenCLInclude.h
+	if(WIN32)
+		if(CMAKE_CL_64)
+			if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+				add_custom_command(TARGET
+					AppParticlesOCL_Nv
+					POST_BUILD
+					COMMAND
+					${CMAKE_COMMAND}
+					ARGS
+					-E
+					copy_if_different
+					${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll
+					${CMAKE_CURRENT_BINARY_DIR})
+			endif()
+		else()
+			if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+				add_custom_command(TARGET
+					AppParticlesOCL_Nv
+					POST_BUILD
+					COMMAND
+					${CMAKE_COMMAND}
+					ARGS
+					-E
+					copy_if_different
+					${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL
+					${CMAKE_CURRENT_BINARY_DIR})
+			endif()
+		endif()
 
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/btParticlesDemoDynamicsWorld.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/main.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesDemo.cpp
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/shaders.cpp
+		if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+			add_custom_command(TARGET
+				AppParticlesOCL_Nv
+				POST_BUILD
+				COMMAND
+				${CMAKE_COMMAND}
+				ARGS
+				-E
+				copy_if_different
+				${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesOCL.cl
+				${CMAKE_CURRENT_BINARY_DIR})
+		endif()
+	endif()
 
-					${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesOCL.cl
-	)
-ELSE (USE_GLUT)
-ENDIF (USE_GLUT)
+	if(UNIX)
+		target_link_libraries(AppParticlesOCL_Nv pthread)
+	endif()
 
-IF(WIN32)
-IF (CMAKE_CL_64)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppParticlesOCL_Nv		POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/glut64.dll ${CMAKE_CURRENT_BINARY_DIR}	)
-	ENDIF()
-ELSE(CMAKE_CL_64)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppParticlesOCL_Nv	POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/GLUT32.DLL ${CMAKE_CURRENT_BINARY_DIR})
-	ENDIF()
-ENDIF(CMAKE_CL_64)
+endif()
 
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		ADD_CUSTOM_COMMAND(	TARGET AppParticlesOCL_Nv	POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/Demos/ParticlesOpenCL/ParticlesOCL.cl ${CMAKE_CURRENT_BINARY_DIR})
-	ENDIF()
-ENDIF(WIN32)
-
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppParticlesOCL_Nv pthread)
-ENDIF(UNIX)
-
-ENDIF(CMAK_GLEW_LIBRARY)
-
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppParticlesOCL_Nv PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppParticlesOCL_Nv PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppParticlesOCL_Nv PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppParticlesOCL_Nv
+		PROPERTIES
+		DEBUG_POSTFIX
+		"_Debug")
+	set_target_properties(AppParticlesOCL_Nv
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppParticlesOCL_Nv
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()

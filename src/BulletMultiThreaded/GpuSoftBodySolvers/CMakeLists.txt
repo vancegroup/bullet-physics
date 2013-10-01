@@ -1,13 +1,9 @@
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
 
-SUBDIRS ( 
-	OpenCL
-)
+add_subdirectory(OpenCL)
 
-IF( USE_DX11 )
-	SUBDIRS( DX11 )
-ENDIF( USE_DX11 )
+if(USE_DX11)
+	add_subdirectory(DX11)
+endif()

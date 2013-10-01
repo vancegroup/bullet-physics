@@ -1,22 +1,9 @@
 
-INCLUDE_DIRECTORIES(
-	${BULLET_PHYSICS_SOURCE_DIR}/src
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
 	${BULLET_PHYSICS_SOURCE_DIR}/UnitTests/cppunit/include
-	
-	
-	${VECTOR_MATH_INCLUDE}
-)
+	${VECTOR_MATH_INCLUDE})
 
-LINK_LIBRARIES(
-	cppunit 
-	BulletMultiThreaded 
-	BulletSoftBody
-	BulletDynamics  
-	BulletCollision 
-	LinearMath
-)
-	
-ADD_EXECUTABLE(AppBulletUnitTests
+add_executable(AppBulletUnitTests
 	Main.cpp
 	TestBulletOnly.h
 	TestLinearMath.h
@@ -27,5 +14,13 @@ ADD_EXECUTABLE(AppBulletUnitTests
 	btCholeskyDecomposition.cpp
 	btCholeskyDecomposition.h
 )
+
+target_link_libraries(AppBulletUnitTests
+	cppunit
+	BulletMultiThreaded
+	BulletSoftBody
+	BulletDynamics
+	BulletCollision
+	LinearMath)
 
 

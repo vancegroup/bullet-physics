@@ -1,20 +1,26 @@
 
-IF (BUILD_BLEND_DEMO OR INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
-	SUBDIRS(BlenderSerialize )
-ENDIF()
+if(BUILD_BLEND_DEMO OR INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+	add_subdirectory(BlenderSerialize)
+endif()
 
 
-IF(INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+if(INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
 
-# makesdna and HeaderGenerator are for advanced use only
-# makesdna can re-generate the binary DNA representing the Bullet serialization structures
-# Be very careful modifying any of this, otherwise the .bullet format becomes incompatible
+	# makesdna and HeaderGenerator are for advanced use only
+	# makesdna can re-generate the binary DNA representing the Bullet serialization structures
+	# Be very careful modifying any of this, otherwise the .bullet format becomes incompatible
 
-	SUBDIRS ( BulletFileLoader BulletXmlWorldImporter BulletWorldImporter HeaderGenerator makesdna)
+	add_subdirectory(BulletFileLoader)
+	add_subdirectory(BulletXmlWorldImporter)
+	add_subdirectory(BulletWorldImporter)
+	add_subdirectory(HeaderGenerator)
+	add_subdirectory(makesdna)
 
-ELSE(INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+else()
 
-	SUBDIRS ( BulletFileLoader BulletXmlWorldImporter BulletWorldImporter )
+	add_subdirectory(BulletFileLoader)
+	add_subdirectory(BulletXmlWorldImporter)
+	add_subdirectory(BulletWorldImporter)
 
-ENDIF (INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+endif()
 

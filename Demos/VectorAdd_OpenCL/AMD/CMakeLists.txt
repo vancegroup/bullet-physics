@@ -1,34 +1,44 @@
 
 
-INCLUDE_DIRECTORIES(
-	${BULLET_PHYSICS_SOURCE_DIR}/src 
-	${AMD_OPENCL_INCLUDES}
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
+	${AMD_OPENCL_INCLUDES})
 
-LINK_LIBRARIES(
- BulletMultiThreaded LinearMath 
- ${CMAKE_ATISTREAMSDK_LIBRARY}
-)
+link_libraries(BulletMultiThreaded
+	LinearMath
+	${CMAKE_ATISTREAMSDK_LIBRARY})
 
-ADD_EXECUTABLE(AppVectorAdd_AMD
-../MiniCL_VectorAdd.cpp
-../VectorAddKernels.cl
-)
+add_executable(AppVectorAdd_AMD
+	../MiniCL_VectorAdd.cpp
+	../VectorAddKernels.cl)
 
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppVectorAdd_AMD pthread)
-ENDIF(UNIX)
+if(UNIX)
+	target_link_libraries(AppVectorAdd_AMD pthread)
+endif()
 
-IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-	ADD_CUSTOM_COMMAND(
-		TARGET AppVectorAdd_AMD
+if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+	add_custom_command(TARGET
+		AppVectorAdd_AMD
 		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${BULLET_PHYSICS_SOURCE_DIR}/Demos/VectorAdd_OpenCL/VectorAddKernels.cl ${CMAKE_CURRENT_BINARY_DIR}
-	)
-ENDIF()
-				
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppVectorAdd_AMD PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppVectorAdd_AMD PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppVectorAdd_AMD PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+		COMMAND
+		${CMAKE_COMMAND}
+		ARGS
+		-E
+		copy_if_different
+		${BULLET_PHYSICS_SOURCE_DIR}/Demos/VectorAdd_OpenCL/VectorAddKernels.cl
+		${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppVectorAdd_AMD
+		PROPERTIES
+		DEBUG_POSTFIX
+		"_Debug")
+	set_target_properties(AppVectorAdd_AMD
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppVectorAdd_AMD
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()

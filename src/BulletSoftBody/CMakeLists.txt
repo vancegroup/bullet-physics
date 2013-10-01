@@ -1,12 +1,8 @@
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src
-	
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
-#SUBDIRS( Solvers )
 
-SET(BulletSoftBody_SRCS
+set(BulletSoftBody_SRCS
 	btSoftBody.cpp
 	btSoftBodyConcaveCollisionAlgorithm.cpp
 	btSoftBodyHelpers.cpp
@@ -14,11 +10,9 @@ SET(BulletSoftBody_SRCS
 	btSoftRigidCollisionAlgorithm.cpp
 	btSoftRigidDynamicsWorld.cpp
 	btSoftSoftCollisionAlgorithm.cpp
-	btDefaultSoftBodySolver.cpp
+	btDefaultSoftBodySolver.cpp)
 
-)
-
-SET(BulletSoftBody_HDRS
+set(BulletSoftBody_HDRS
 	btSoftBody.h
 	btSoftBodyData.h
 	btSoftBodyConcaveCollisionAlgorithm.h
@@ -28,38 +22,54 @@ SET(BulletSoftBody_HDRS
 	btSoftRigidDynamicsWorld.h
 	btSoftSoftCollisionAlgorithm.h
 	btSparseSDF.h
-
 	btSoftBodySolvers.h
 	btDefaultSoftBodySolver.h
-
-	btSoftBodySolverVertexBuffer.h
-)
+	btSoftBodySolverVertexBuffer.h)
 
 
 
-ADD_LIBRARY(BulletSoftBody  ${BulletSoftBody_SRCS} ${BulletSoftBody_HDRS})
-SET_TARGET_PROPERTIES(BulletSoftBody PROPERTIES VERSION ${BULLET_VERSION})
-SET_TARGET_PROPERTIES(BulletSoftBody PROPERTIES SOVERSION ${BULLET_VERSION})
-IF (BUILD_SHARED_LIBS)
-	TARGET_LINK_LIBRARIES(BulletSoftBody BulletDynamics)
-ENDIF (BUILD_SHARED_LIBS)
+add_library(BulletSoftBody
+	${BulletSoftBody_SRCS}
+	${BulletSoftBody_HDRS})
+set_target_properties(BulletSoftBody
+	PROPERTIES
+	VERSION
+	${BULLET_VERSION})
+set_target_properties(BulletSoftBody
+	PROPERTIES
+	SOVERSION
+	${BULLET_VERSION})
+if(BUILD_SHARED_LIBS)
+	target_link_libraries(BulletSoftBody BulletDynamics)
+endif()
 
-IF (INSTALL_LIBS)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-			IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS BulletSoftBody DESTINATION .)
-			ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-			INSTALL(TARGETS BulletSoftBody DESTINATION lib${LIB_SUFFIX})
-				INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.h"  PATTERN
-".svn" EXCLUDE PATTERN "CMakeFiles" EXCLUDE)
-			ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-		ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+if(INSTALL_LIBS)
+	if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			install(TARGETS BulletSoftBody DESTINATION .)
+		else()
+			install(TARGETS BulletSoftBody DESTINATION lib${LIB_SUFFIX})
+			install(DIRECTORY
+				${CMAKE_CURRENT_SOURCE_DIR}
+				DESTINATION
+				${INCLUDE_INSTALL_DIR}
+				FILES_MATCHING
+				PATTERN
+				"*.h"
+				PATTERN
+				".svn"
+				EXCLUDE
+				PATTERN
+				"CMakeFiles"
+				EXCLUDE)
+		endif()
 
-		IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-			SET_TARGET_PROPERTIES(BulletSoftBody PROPERTIES FRAMEWORK true)
-			SET_TARGET_PROPERTIES(BulletSoftBody PROPERTIES PUBLIC_HEADER "${BulletSoftBody_HDRS}")
-		ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-	ENDIF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-ENDIF (INSTALL_LIBS)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			set_target_properties(BulletSoftBody PROPERTIES FRAMEWORK true)
+			set_target_properties(BulletSoftBody
+				PROPERTIES
+				PUBLIC_HEADER
+				"${BulletSoftBody_HDRS}")
+		endif()
+	endif()
+endif()

@@ -2,27 +2,30 @@
 
 
 
-INCLUDE_DIRECTORIES(
-	${BULLET_PHYSICS_SOURCE_DIR}/src 
-	${NVIDIA_OPENCL_INCLUDES}
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src
+	${NVIDIA_OPENCL_INCLUDES})
 
-LINK_LIBRARIES(
-	 LinearMath 
-	${NVIDIA_OPENCL_LIBRARIES}
-)
+add_executable(AppVectorAdd_NVidia
+	../MiniCL_VectorAdd.cpp
+	../VectorAddKernels.cl)
 
-ADD_EXECUTABLE(AppVectorAdd_NVidia
-../MiniCL_VectorAdd.cpp
-../VectorAddKernels.cl
-)
+target_link_libraries(AppVectorAdd_NVidia LinearMath ${NVIDIA_OPENCL_LIBRARIES})
 
-IF (UNIX)
-  TARGET_LINK_LIBRARIES(AppVectorAdd_NVidia pthread)
-ENDIF(UNIX)
+if(UNIX)
+	target_link_libraries(AppVectorAdd_NVidia pthread)
+endif()
 
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppVectorAdd_NVidia PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppVectorAdd_NVidia PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppVectorAdd_NVidia PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppVectorAdd_NVidia
+		PROPERTIES
+		DEBUG_POSTFIX
+		"_Debug")
+	set_target_properties(AppVectorAdd_NVidia
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppVectorAdd_NVidia
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()

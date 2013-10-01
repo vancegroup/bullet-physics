@@ -1,23 +1,23 @@
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
-SET(DXSDK_DIR $ENV{DXSDK_DIR})
-SET(DX11_INCLUDE_PATH  "${DIRECTX_SDK_BASE_DIR}/Include" CACHE DOCSTRING "Microsoft directX SDK include path")
+set(DXSDK_DIR $ENV{DXSDK_DIR})
+set(DX11_INCLUDE_PATH
+	"${DIRECTX_SDK_BASE_DIR}/Include"
+	CACHE
+	DOCSTRING
+	"Microsoft directX SDK include path")
 
 
-INCLUDE_DIRECTORIES(
-${DX11_INCLUDE_PATH} "../Shared/"
-${VECTOR_MATH_INCLUDE}
-)
+include_directories(${DX11_INCLUDE_PATH}
+	"../Shared/"
+	${VECTOR_MATH_INCLUDE})
 
-SET(BulletSoftBodyDX11Solvers_SRCS
+set(BulletSoftBodyDX11Solvers_SRCS
 	btSoftBodySolver_DX11.cpp
-	btSoftBodySolver_DX11SIMDAware.cpp
-)
+	btSoftBodySolver_DX11SIMDAware.cpp)
 
-SET(BulletSoftBodyDX11Solvers_HDRS
+set(BulletSoftBodyDX11Solvers_HDRS
 	btSoftBodySolver_DX11.h
 	btSoftBodySolver_DX11SIMDAware.h
 	../Shared/btSoftBodySolverData.h
@@ -26,14 +26,12 @@ SET(BulletSoftBodyDX11Solvers_HDRS
 	btSoftBodySolverLinkData_DX11.h
 	btSoftBodySolverLinkData_DX11SIMDAware.h
 	btSoftBodySolverBuffer_DX11.h
-	btSoftBodySolverVertexBuffer_DX11.h
-
-)
+	btSoftBodySolverVertexBuffer_DX11.h)
 
 # OpenCL and HLSL Shaders.
 # Build rules generated to stringify these into headers
 # which are needed by some of the sources
-SET(BulletSoftBodyDX11Solvers_Shaders
+set(BulletSoftBodyDX11Solvers_Shaders
 	OutputToVertexArray
 	UpdateNormals
 	Integrate
@@ -47,37 +45,54 @@ SET(BulletSoftBodyDX11Solvers_Shaders
 	UpdatePositionsFromVelocities
 	ApplyForces
 	PrepareLinks
-	VSolveLinks
-)
+	VSolveLinks)
 
 foreach(f ${BulletSoftBodyDX11Solvers_Shaders})
-    LIST(APPEND BulletSoftBodyDX11Solvers_HLSL "HLSL/${f}.hlsl")
-endforeach(f) 
+	list(APPEND BulletSoftBodyDX11Solvers_HLSL "HLSL/${f}.hlsl")
+endforeach()
 
 
 
-ADD_LIBRARY(BulletSoftBodySolvers_DX11  ${BulletSoftBodyDX11Solvers_SRCS} ${BulletSoftBodyDX11Solvers_HDRS} ${BulletSoftBodyDX11Solvers_HLSL})
-SET_TARGET_PROPERTIES(BulletSoftBodySolvers_DX11 PROPERTIES VERSION ${BULLET_VERSION})
-SET_TARGET_PROPERTIES(BulletSoftBodySolvers_DX11 PROPERTIES SOVERSION ${BULLET_VERSION})
-IF (BUILD_SHARED_LIBS)
-	TARGET_LINK_LIBRARIES(BulletSoftBodySolvers_DX11 BulletSoftBody BulletDynamics)
-ENDIF (BUILD_SHARED_LIBS)
+add_library(BulletSoftBodySolvers_DX11
+	${BulletSoftBodyDX11Solvers_SRCS}
+	${BulletSoftBodyDX11Solvers_HDRS}
+	${BulletSoftBodyDX11Solvers_HLSL})
+set_target_properties(BulletSoftBodySolvers_DX11
+	PROPERTIES
+	VERSION
+	${BULLET_VERSION})
+set_target_properties(BulletSoftBodySolvers_DX11
+	PROPERTIES
+	SOVERSION
+	${BULLET_VERSION})
+if(BUILD_SHARED_LIBS)
+	target_link_libraries(BulletSoftBodySolvers_DX11
+		BulletSoftBody
+		BulletDynamics)
+endif()
 
 
-IF (INSTALL_LIBS)
-	IF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-		IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-			IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS BulletSoftBodySolvers_DX11 DESTINATION .)
-			ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-			INSTALL(TARGETS BulletSoftBodySolvers_DX11 DESTINATION lib${LIB_SUFFIX})
-#headers are already installed by BulletMultiThreaded library
-			ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-		ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+if(INSTALL_LIBS)
+	if(NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			install(TARGETS BulletSoftBodySolvers_DX11 DESTINATION .)
+		else()
+			install(TARGETS
+				BulletSoftBodySolvers_DX11
+				DESTINATION
+				lib${LIB_SUFFIX})
+			#headers are already installed by BulletMultiThreaded library
+		endif()
 
-		IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-			SET_TARGET_PROPERTIES(BulletSoftBodySolvers_DX11 PROPERTIES FRAMEWORK true)
-			SET_TARGET_PROPERTIES(BulletSoftBodySolvers_DX11 PROPERTIES PUBLIC_HEADER "${BulletSoftBodyDX11Solvers_HDRS}")
-		ENDIF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-	ENDIF (NOT INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
-ENDIF (INSTALL_LIBS)
+		if(APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
+			set_target_properties(BulletSoftBodySolvers_DX11
+				PROPERTIES
+				FRAMEWORK
+				true)
+			set_target_properties(BulletSoftBodySolvers_DX11
+				PROPERTIES
+				PUBLIC_HEADER
+				"${BulletSoftBodyDX11Solvers_HDRS}")
+		endif()
+	endif()
+endif()

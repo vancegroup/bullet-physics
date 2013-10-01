@@ -1,29 +1,27 @@
 # HelloWorld is a minimal sample creating, stepping and deleting a Bullet dynamics world
 
-INCLUDE_DIRECTORIES(
-${BULLET_PHYSICS_SOURCE_DIR}/src 
-)
+include_directories(${BULLET_PHYSICS_SOURCE_DIR}/src)
 
-LINK_LIBRARIES(
- BulletDynamics BulletCollision LinearMath 
-)
+if(WIN32)
+	add_executable(AppHelloWorld
+		HelloWorld.cpp
+		${BULLET_PHYSICS_SOURCE_DIR}/build/bullet.rc)
+else()
+	add_executable(AppHelloWorld HelloWorld.cpp)
+endif()
 
-IF (WIN32)
-	ADD_EXECUTABLE(AppHelloWorld
-		HelloWorld.cpp 
-		${BULLET_PHYSICS_SOURCE_DIR}/build/bullet.rc
-	)
-ELSE()
-	ADD_EXECUTABLE(AppHelloWorld
-		HelloWorld.cpp 
-	)
-ENDIF()
+target_link_libraries(AppHelloWorld BulletDynamics BulletCollision LinearMath)
 
 
 
-
-IF (INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
-			SET_TARGET_PROPERTIES(AppHelloWorld PROPERTIES  DEBUG_POSTFIX "_Debug")
-			SET_TARGET_PROPERTIES(AppHelloWorld PROPERTIES  MINSIZEREL_POSTFIX "_MinsizeRel")
-			SET_TARGET_PROPERTIES(AppHelloWorld PROPERTIES  RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo")
-ENDIF(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+if(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES)
+	set_target_properties(AppHelloWorld PROPERTIES DEBUG_POSTFIX "_Debug")
+	set_target_properties(AppHelloWorld
+		PROPERTIES
+		MINSIZEREL_POSTFIX
+		"_MinsizeRel")
+	set_target_properties(AppHelloWorld
+		PROPERTIES
+		RELWITHDEBINFO_POSTFIX
+		"_RelWithDebugInfo")
+endif()
